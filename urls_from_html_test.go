@@ -29,6 +29,34 @@ func TestGetURLsFromHTML(t *testing.T) {
 		`,
 			expected: []string{"https://blog.boot.dev/path/one", "https://other.com/path/one"},
 		},
+		{
+			name:     "no links",
+			inputURL: "https://blog.boot.dev",
+			inputBody: `
+		<html>
+			<body>
+			</body>
+		<html>
+		`,
+			expected: nil,
+		},
+		{
+			name:     "query parameters",
+			inputURL: "https://blog.boot.dev",
+			inputBody: `
+		<html>
+			<body>
+				<a href="/path/one?id=123">
+					<span>Boot.dev</span>
+				</a>
+				<a href="https://other.com/path/one?id=124">
+					<span>Boot.dev</span>
+				</a>
+			</body>
+		</html>
+		`,
+			expected: []string{"https://blog.boot.dev/path/one?id=123", "https://other.com/path/one?id=124"},
+		},
 	}
 
 	for i, tc := range tests {
