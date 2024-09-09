@@ -22,6 +22,10 @@ func getHTML(rawURL string) error {
 		return errors.New("response status code is error-level(400+)")
 	}
 
+	if res.Header.Get("Content-Type") != "text/html" {
+		return errors.New("invalid content-type")
+	}
+
 	fmt.Println(body)
 
 	return nil
