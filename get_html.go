@@ -1,28 +1,31 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func getHTML(rawURL string) (string, error) {
 	res, err := http.Get(rawURL)
 
 	if err != nil {
-		return "", errors.New("error while getting HTML from website")
+		return "", fmt.Errorf("error while getting HTML from website: %v", err)
 	}
 	if res.StatusCode > 399 {
-		return "", errors.New("response status code is error-level(400+)")
+		return "", fmt.Errorf("HTTP Error: %v", err)
 	}
-	if res.Header.Get("Content-Type") != "text/html" {
-		return "", errors.New("invalid content-type")
+
+	contentType := res.Header.Get("Content-Type")
+	if !strings.Contains(contentType, "text/html") {
+		return "", fmt.Errorf("got non-HTML response: %s", err)
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", errors.New("error while processing response")
+		return "", fmt.Errorf("error while processing response")
 	}
 
 	return string(body), nil

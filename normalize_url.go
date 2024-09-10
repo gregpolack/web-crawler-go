@@ -3,15 +3,20 @@ package main
 import (
 	"errors"
 	"net/url"
+	"strings"
 )
 
 func normalizeURL(rawURL string) (string, error) {
-	s, err := url.Parse(rawURL)
+	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return "", errors.New("error normalizing the given URL")
 	}
-	if string(s.Path[len(s.Path)-1]) == "/" {
-		s.Path = string(s.Path[:len(s.Path)-1])
-	}
-	return s.Host + s.Path, nil
+
+	fullPath := parsedURL.Host + parsedURL.Path
+
+	fullPath = strings.ToLower(fullPath)
+
+	fullPath = strings.TrimSuffix(fullPath, "/")
+
+	return fullPath, nil
 }
